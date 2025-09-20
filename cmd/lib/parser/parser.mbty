@@ -1,0 +1,117 @@
+%derive<Show, Eq> Token
+%derive<Show> ParseError
+%position<Int>
+%start json_value
+
+// 定义 JSON 词法标记 (Tokens)
+%token <String> STRING
+%token <Double> NUMBER
+%token TRUE               "true"
+%token FALSE              "false"
+%token NULL               "null"
+%token LBRACE             "{"
+%token RBRACE             "}"
+%token LBRACKET           "["
+%token RBRACKET           "]"
+%token COLON              ":"
+%token COMMA              ","
+
+// 定义语法规则的返回值类型
+%type <JsonValue> json_value
+%type <Object> object
+%type <Array> array
+%type <@list.List[(String, JsonValue)]> members
+%type <@list.List[JsonValue]> elements
+%type <(String, JsonValue)> member
+
+// 假设在别处定义了 JsonValue, Object, Array 等 AST 类型
+// 例如：
+// enum JsonValue { 
+//   String(String); Number(Double); Boolean(Bool); Null; 
+//   Object(Object); Array(Array)
+// }
+// type Object = @map.Map[String, JsonValue]
+// type Array = Array[JsonValue]
+
+%%
+
+json_value:
+  | STRING                { JsonValue::String($1) }
+  | NUMBER                { JsonValue::Number($1) }
+  | TRUE                  { JsonValue::Boolean(true) }
+  | FALSE                 { JsonValue::Boolean(false) }
+  | NULL                  { JsonValue::Null }
+  | object                { JsonValue::Object($1) }
+  | array                 { JsonValue::Array($1) }
+  ;
+
+object:
+  | LBRACE RBRACE         { @map.Map::new() }  // 空对象
+  | LBRACE members RBRACE { 
+      // 使用辅助函数 list_to_map 从成员列表构建 Map
+      list_to_map($2)
+    }
+  ;
+
+members:
+  | member                { @list.More($1, @list.Empty) } // 修改这里：Cons -> More, Nil -> Empty
+  | member COMMA members  { @list.More($1, $3) }          // 修改这里：Cons -> More
+  ;
+
+member:
+  | STRING COLON json_value { ($1, $3) }
+  ;
+
+array:
+  | LBRACKET RBRACKET     { Array::new() }  // 空数组
+  | LBRACKET elements RBRACKET { 
+      // 将 List[JsonValue] 转换为 Array[JsonValue]
+      list_to_array($2)
+    }
+  ;
+
+elements:
+  | json_value           { @list.More($1, @list.Empty) } // 修改这里：Cons -> More, Nil -> Empty
+  | json_value COMMA elements { @list.More($1, $3) }      // 修改这里：Cons -> More
+  ;
+
+%%
+
+// 辅助函数：将 List[(String, JsonValue)] 转换为 Map[String, JsonValue]
+fn list_to_map(lst: @list.List[(String, JsonValue)]) -> @map.Map[String, JsonValue] {
+  let map = @map.Map::new()
+  fn build_map(lst: @list.List[(String, JsonValue)], map: @map.Map[String, JsonValue]) -> @map.Map[String, JsonValue] {
+    match lst {
+      @list.More((k, v), rest) => { // 修改这里：Cons -> More
+        map.set(k, v)  // 使用 set 方法插入键值对（原地修改）
+        build_map(rest, map)
+      }
+      @list.Empty => map // 修改这里：Nil -> Empty
+    }
+  }
+  build_map(lst, map)
+}
+
+// 辅助函数：将 List[JsonValue] 转换为 Array[JsonValue]
+fn list_to_array(lst: @list.List[JsonValue]) -> Array[JsonValue] {
+  let len = lst.length()
+  let arr = Array::make(len, JsonValue::Null) // 预分配数组
+  
+  fn fill_array(idx: Int, lst: @list.List[JsonValue], arr: Array[JsonValue]) -> Unit {
+    match lst {
+      @list.More(head, tail) => { // 修改这里：Cons -> More
+        arr[idx] = head
+        fill_array(idx + 1, tail, arr)
+      }
+      @list.Empty => () // 修改这里：Nil -> Empty
+    }
+  }
+  
+  fill_array(0, lst, arr)
+  arr
+}
+
+// 可选的初始化代码
+fn init {
+  // 例如，初始化词法分析器或注册解析器
+}

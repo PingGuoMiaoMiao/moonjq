@@ -11,8 +11,23 @@ pub(all) enum Token {
   RBRACKET
   COLON
   COMMA
-  WHITESPACE
 } derive(ToJson(style="legacy"))
+
+pub impl Show for Token with output(self, logger) {
+  match self {
+    STRING(s) => logger.write_string("STRING(\"" + s + "\")")
+    NUMBER(n) => logger.write_string("NUMBER(" + n.to_string() + ")")
+    TRUE => logger.write_string("TRUE")
+    FALSE => logger.write_string("FALSE")
+    NULL => logger.write_string("NULL")
+    LBRACE => logger.write_string("LBRACE")
+    RBRACE => logger.write_string("RBRACE")
+    LBRACKET => logger.write_string("LBRACKET")
+    RBRACKET => logger.write_string("RBRACKET")
+    COLON => logger.write_string("COLON")
+    COMMA => logger.write_string("COMMA")
+  }
+}
 
 ///|
 pub fn Token::kind(self : Token) -> TokenKind {
@@ -329,13 +344,24 @@ fn yy_action_11(_last_pos : Int, _args : ArrayView[(YYObj, Int, Int)]) -> YYObj 
 
 ///|
 pub fn yy_action_12(_last_pos: Int, _args: ArrayView[(YYObj, Int, Int)]) -> YYObj {
-  guard _args[0].0 is YYObj_Array(arr)
-  YYObj_JsonValue(
-    {
-      ()
-      JsonValue::Array(arr)
-    },
-  )
+  guard _args[0].0 is YYObj_Array(arrs)
+    let arr: Array[JsonValue] = if arrs.length() == 1 {
+      arrs[0]
+    } else {
+      let flat: Array[JsonValue] = Array::new()
+      for sub in arrs {
+        for v in sub {
+          flat.push(v)
+        }
+      }
+      flat
+    }
+    YYObj_JsonValue(
+      {
+        ()
+        JsonValue::Array(arr)
+      },
+    )
 }
 
 // file:///./parser.mbty
@@ -888,55 +914,30 @@ pub fn json_value(
 ///|
 fn list_to_map(lst: @list.List[(String, JsonValue)]) -> @builtin.Map[String, JsonValue] {
   let map = @builtin.Map::new()
-  
-  // 使用迭代而不是递归来避免可能的栈溢出
-  fn build_map(
-    current_list: @list.List[(String, JsonValue)], 
-    result_map: @builtin.Map[String, JsonValue]
-  ) -> @builtin.Map[String, JsonValue] {
-    if current_list.is_empty() {
-      result_map // 基础情况：空列表，返回构建好的 Map
-    } else {
-      // 使用 head() 和 tail() 方法而不是模式匹配
-      match current_list.head() {
-        Some((key, value)) => {
-          result_map.set(key, value)
-          build_map(current_list.unsafe_tail(), result_map)
-        }
-        None => result_map // 理论上不会走到这里，因为 is_empty 为 false
-      }
+  let mut cur = lst
+  while not(cur.is_empty()) {
+    match cur.head() {
+      Some((key, value)) => map.set(key, value)
+      None => ()
     }
+    cur = cur.unsafe_tail()
   }
-  
-  build_map(lst, map)
+  map
 }
 
 // 辅助函数：将 List[JsonValue] 转换为 Array[JsonValue]
 
 ///|
 fn list_to_array(lst: @list.List[JsonValue]) -> Array[JsonValue] {
-  let len = lst.length()
-  let arr = Array::make(len, JsonValue::Null) // 预分配数组
-  
-  // 使用迭代而不是递归
-  fn fill_array(
-    idx: Int, 
-    current_list: @list.List[JsonValue], 
-    result_array: Array[JsonValue]
-  ) -> Unit {
-    if not(current_list.is_empty()) {
-      match current_list.head() {
-        Some(head_val) => {
-          result_array[idx] = head_val
-          fill_array(idx + 1, current_list.unsafe_tail(), result_array)
-        }
-        None => () // 理论上不会走到这里
-      }
+  let arr = Array::new()
+  let mut cur = lst
+  while not(cur.is_empty()) {
+    match cur.head() {
+      Some(val) => arr.push(val)
+      None => ()
     }
-    // 当列表为空时，递归结束
+    cur = cur.unsafe_tail()
   }
-  
-  fill_array(0, lst, arr)
   arr
 }
 

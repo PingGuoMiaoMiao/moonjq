@@ -1,4 +1,4 @@
-// JSON 过滤器的实现 (reference-based to match main/lexer expectations)
+// JSON 过滤器的实现
 
 pub enum Filter {
   Identity
@@ -22,104 +22,85 @@ fn normalize_index(index: Int, len: Int) -> Int {
   }
 }
 
-fn is_null(value: @parser.JsonValue) -> Bool {
+fn is_null(value: parser.JsonValue) -> Bool {
   match value {
-    @parser.JsonValue::Null => true
+    parser.JsonValue::Null => true
     _ => false
   }
 }
 
-fn eval_filter(f: Filter, input: @parser.JsonValue) -> @parser.JsonValue {
+fn eval_filter(f: Filter, input: parser.JsonValue) -> parser.JsonValue {
   match f {
     Identity => input
 
     ObjectIdentifier(field) => match input {
-      @parser.JsonValue::Object(obj) => match obj.get(field) {
+      parser.JsonValue::Object(obj) => match obj.get(field) {
         Some(v) => v
-        None => input
+        None => parser.json_null()
       }
-      _ => input
+      _ => parser.json_null()
     }
 
     ArrayIndex(idx) => match input {
-      @parser.JsonValue::Array(arr) => {
+      parser.JsonValue::Array(arr) => {
         if idx >= 0 && idx < arr.length() {
           arr[idx]
         } else {
-          input
+          parser.json_null()
         }
       }
-      _ => input
+      _ => parser.JsonValue::Null
     }
 
     Pipe(a, b) => eval_filter(b, eval_filter(a, input))
 
     Array(filters) => {
-      let result = Array::new()
-      let mut i = 0
+      let array_out = Array::new()
+      let i = 0
       while i < filters.length() {
-        ignore(result.push(eval_filter(filters[i], input)))
+        array_out.push(eval_filter(filters[i], input))
         i = i + 1
       }
-      input
+      parser.json_array(array_out)
     }
 
     Object(pairs) => {
-      let result = @builtin.Map::new()
-      let mut i = 0
+      let object_map = @builtin.Map::new()
+      let i = 0
       while i < pairs.length() {
         let (key, f2) = pairs[i]
-        let value = eval_filter(f2, input)
-        ignore(result.set(key, value))
+        object_map.set(key, eval_filter(f2, input))
         i = i + 1
       }
-      input
+      parser.json_object(object_map)
     }
 
     Optional(inner) => {
-      let result = eval_filter(inner, input)
-      if is_null(result) { input } else { result }
+      let opt_result = eval_filter(inner, input)
+      if is_null(opt_result) { parser.json_null() } else { opt_result }
     }
 
     Alternative(a, b) => {
-      let result = eval_filter(a, input)
-      if is_null(result) { eval_filter(b, input) } else { result }
+      let alt_result = eval_filter(a, input)
+      if is_null(alt_result) { eval_filter(b, input) } else { alt_result }
     }
 
     Slice(start, end, step) => match input {
-      @parser.JsonValue::Array(arr) => {
+      parser.JsonValue::Array(arr) => {
         let len = arr.length()
-        let s = match start {
-          Some(idx) => normalize_index(idx, len)
-          None => 0
+        let s = match start { Some(idx) => normalize_index(idx, len) None => 0 }
+        let e = match end { Some(idx) => normalize_index(idx, len) None => len }
+        let stp = match step { Some(n) => n None => 1 }
+        if stp == 0 { return parser.json_null() }
+        let slice_out = Array::new()
+        let mut i = s
+        while (stp > 0 && i < e) || (stp < 0 && i > e) {
+          if i >= 0 && i < len { slice_out.push(arr[i]) }
+          i = i + stp
         }
-        let e = match end {
-          Some(idx) => normalize_index(idx, len)
-          None => len
-        }
-        let stp = match step {
-          Some(n) => n
-          None => 1
-        }
-        
-        if stp == 0 {
-          input
-        } else {
-          let result = Array::new()
-          let mut i = s
-          while (stp > 0 && i < e) || (stp < 0 && i > e) {
-            if i >= 0 && i < len {
-              match arr.get(i) {
-                Some(v) => ignore(result.push(v))
-                None => ()
-              }
-            }
-            i = i + stp
-          }
-          input
-        }
+        parser.json_array(slice_out)
       }
-      _ => input
+      _ => parser.json_null()
     }
   }
 }
@@ -144,6 +125,6 @@ pub fn slice(start: Option[Int], end: Option[Int], step: Option[Int]) -> Filter 
   Slice(start, end, step)
 }
 
-pub fn apply_filter(f: Filter, input: @parser.JsonValue) -> @parser.JsonValue {
+pub fn apply_filter(f: Filter, input: parser.JsonValue) -> parser.JsonValue {
   eval_filter(f, input)
 }

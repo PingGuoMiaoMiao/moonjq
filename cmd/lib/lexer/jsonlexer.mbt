@@ -4,8 +4,97 @@ pub suberror LexError {
   Unrecognized(String)
 }
 
+// 简单的字符串到 Double 解析器，支持可选符号、小数部分和指数部分。
+fn str_to_double(s: String) -> Double {
+  // We iterate by codepoint index using safe get_char().unwrap().
+  let len = s.length()
+  let mut i = 0
+  let mut sign = 1.0
+  if i < len {
+    let c = s.get_char(i).unwrap()
+    if c == '-' { sign = -1.0; i = i + 1 }
+    else if c == '+' { i = i + 1 }
+  }
 
-fn token(lexbuf : @lexbuf.StringLexbuf) -> @parser.Token raise LexError  {
+  let mut int_part: Double = 0.0
+  while i < len {
+    let c = s.get_char(i).unwrap()
+    if c >= '0' && c <= '9' {
+      int_part = int_part * 10.0 + Double::from_int(char_digit(c))
+      i = i + 1
+    } else {
+      break
+    }
+  }
+
+  let mut frac_part: Double = 0.0
+  let mut frac_div: Double = 1.0
+  if i < len && s.get_char(i).unwrap() == '.' {
+    i = i + 1
+    while i < len {
+      let c = s.get_char(i).unwrap()
+      if c >= '0' && c <= '9' {
+        frac_part = frac_part * 10.0 + Double::from_int(char_digit(c))
+        frac_div = frac_div * 10.0
+        i = i + 1
+      } else { break }
+    }
+  }
+
+  let mut exp_sign = 1
+  let mut exp_val = 0
+  if i < len {
+    let c = s.get_char(i).unwrap()
+    if c == 'e' || c == 'E' {
+      i = i + 1
+      if i < len {
+        let c2 = s.get_char(i).unwrap()
+        if c2 == '-' { exp_sign = -1; i = i + 1 }
+        else if c2 == '+' { i = i + 1 }
+      }
+      while i < len {
+        let c3 = s.get_char(i).unwrap()
+        if c3 >= '0' && c3 <= '9' {
+          exp_val = exp_val * 10 + char_digit(c3)
+          i = i + 1
+        } else { break }
+      }
+    }
+  }
+
+  let mut value = int_part + (if frac_div == 1.0 { 0.0 } else { frac_part / frac_div })
+  if exp_val != 0 {
+    let mut p = 1.0
+    let mut k = 0
+    while k < exp_val {
+      p = p * 10.0
+      k = k + 1
+    }
+    if exp_sign < 0 { value = value / p } else { value = value * p }
+  }
+  sign * value
+}
+
+
+// helper: convert a Char representing '0'..'9' to its Int digit value
+fn char_digit(c: Char) -> Int {
+  match c {
+    '0' => 0
+    '1' => 1
+    '2' => 2
+    '3' => 3
+    '4' => 4
+    '5' => 5
+    '6' => 6
+    '7' => 7
+    '8' => 8
+    '9' => 9
+    _ => 0
+  }
+}
+
+
+pub fn token(lexbuf : @lexbuf.StringLexbuf) -> @parser.Token raise LexError  {
   // The matched pattern id
   let mut _match_pattern = @int.max_value
   let mut _match_start = lexbuf.curr_pos()
@@ -283,7 +372,8 @@ fn token(lexbuf : @lexbuf.StringLexbuf) -> @parser.Token raise LexError  {
     1 => {
       ()
       let t = lexbuf.get_string(_capture_0_start, _capture_0_end)
- NUMBER(t) 
+      let n = str_to_double(t)
+      NUMBER(n)
     }
     2 => {
       ()
@@ -345,7 +435,7 @@ fn token(lexbuf : @lexbuf.StringLexbuf) -> @parser.Token raise LexError  {
 }
 
 
-fn lex_string(buf : StringBuilder, lexbuf : @lexbuf.StringLexbuf) -> Unit raise LexError  {
+pub fn lex_string(buf : StringBuilder, lexbuf : @lexbuf.StringLexbuf) -> Unit raise LexError  {
   // The matched pattern id
   let mut _match_pattern = @int.max_value
   let mut _match_start = lexbuf.curr_pos()

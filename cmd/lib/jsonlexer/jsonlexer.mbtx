@@ -12,7 +12,7 @@ priv enum Token {
   TRUE
   FALSE
   NULL
-} derive(ToJson(style="legacy"))
+} derive(ToJson(style = "legacy"))
 
 pub suberror LexError {
   EndOfFile
@@ -21,13 +21,13 @@ pub suberror LexError {
 }
 }
 
-rule token(lexbuf : @lexbuf.IStringLexbuf) -> @parser.Token raise LexError {
+rule token() -> Token raise LexError {
   parse {
     [' ' '\t' '\r' '\n'] => { WHITESPACE }
     ('-'? ('0' | ['1'-'9'] ['0'-'9']* ('.' ['0'-'9']+)?) (['E' 'e'] ['+' '-']? ['0'-'9']+)?) as t => { NUMBER(t) }
     '"' as t => {
       let buf = StringBuilder::new()
-      buf.write_char(t)
+      buf.write_string(t)
       lex_string(buf, lexbuf)
       STRING(buf.to_string())
     }
@@ -40,15 +40,14 @@ rule token(lexbuf : @lexbuf.IStringLexbuf) -> @parser.Token raise LexError {
     "true" => { TRUE }
     "false" => { FALSE }
     "null" => { NULL }
-    _ as t => { raise(Unrecognized(String::make(1, t))) }
+    _ as t => { raise(Unrecognized(t)) }
     "" => { raise(EndOfFile) }
   }
 }
 
-
-rule lex_string(buf : StringBuilder, lexbuf : @lexbuf.IStringLexbuf) -> Unit raise LexError {
+rule lex_string(buf : StringBuilder) -> Unit raise LexError {
   parse {
-    '"' as t => { buf.write_char(t) }
+    '"' as t => { buf.write_string(t) }
     ( '\\' '"'
     | '\\' '\\'
     | '\\' '/'
@@ -61,11 +60,14 @@ rule lex_string(buf : StringBuilder, lexbuf : @lexbuf.IStringLexbuf) -> Unit rai
       buf.write_string(t)
       lex_string(buf, lexbuf)
     }
-    _ \ ['"' '\\' '\x00'-'\x1F' '\x7f'] as t => { 
-      buf.write_char(t)
+    [^ '"' '\\' '\x00'-'\x1F' '\x7f'] as t => { 
+      buf.write_string(t)
       lex_string(buf, lexbuf)
     }
-    _ as t => { raise(Unrecognized(String::make(1, t))) }
+    _ as t => { raise(Unrecognized(t)) }
     "" => { raise(UnexpectedEndOfFile) }
   }
+}
+
+{
 }

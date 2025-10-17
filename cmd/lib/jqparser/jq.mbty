@@ -1,0 +1,56 @@
+%derive<Show> Token
+%derive<Show> ParseError
+%position<Int>
+%start start
+
+%token EOF
+%token DOT          "."
+%token PIPE         "|"
+%token LBRACKET     "["
+%token RBRACKET     "]"
+%token LPAREN       "("
+%token RPAREN       ")"
+%token< String > IDENT
+%token< Int > NUMBER
+%token< String > STRING
+
+%type<Expr> start
+%type<Expr> expr
+%type<Expr> primary
+%type<Field> field_chain
+
+%%
+
+start
+  : expr EOF
+    { $1 }
+  ;
+
+expr
+  : lhs=expr "|" rhs=expr
+      { Expr::Pipe(lhs, rhs) }
+  | primary
+      { $1 }
+  ;
+
+primary
+  : DOT
+      { Expr::Identity }
+  | DOT field_chain
+      { Expr::FieldAccess($2) }
+  | DOT field_chain LBRACKET NUMBER RBRACKET
+      { Expr::Index(Expr::FieldAccess($2), $4) }
+  | NUMBER
+      { Expr::Number($1) }
+  | STRING
+      { Expr::String($1) }
+  | LPAREN expr RPAREN
+      { $2 }
+  ;
+
+field_chain
+  : IDENT
+      { Field::Single($1) }
+  | lhs=field_chain DOT IDENT
+      { Field::Chain(lhs, $3) }
+  ;

@@ -1,0 +1,12 @@
+{
+  "import": [
+    "moonbitlang/yacc/lib/util/logger_with_cursor"
+  ]
+    // "pre-build": [
+    //     {
+    //         "command": "$mod_dir/.mooncakes/moonbitlang/yacc/moonyacc $input | moonfmt > $output",
+    //         "input": "jq.mbty",
+    //         "output": "jq.mbt"
+    //     }
+    // ]
+}

@@ -1,7 +1,7 @@
 ///|
 pub(all) enum Token {
   STRING(String)
-  NUMBER(Double)
+  NUMBER(JsonNumber)
   TRUE
   FALSE
   NULL
@@ -96,7 +96,7 @@ priv suberror YYObj_Void
 priv suberror YYObj_Array Array[Array[JsonValue]]
 
 ///|
-priv suberror YYObj_Double Double
+priv suberror YYObj_Double JsonNumber
 
 ///|
 priv suberror YYObj_Object Object
@@ -276,10 +276,14 @@ fn yy_action_6(_last_pos : Int, _args : ArrayView[(YYObj, Int, Int)]) -> YYObj {
 ///|
 fn yy_action_7(_last_pos : Int, _args : ArrayView[(YYObj, Int, Int)]) -> YYObj {
   guard _args[0].0 is YYObj_Double(_dollar1)
+  let num = match _dollar1 {
+    Float(d) => JsonNumber::Float(d)
+    BigInt(s) => JsonNumber::BigInt(s)
+  }
   YYObj_JsonValue(
     {
       ()
-      JsonValue::Number(_dollar1)
+      JsonValue::Number(num)
     },
   )
 }
@@ -523,7 +527,9 @@ fn yy_state_3(_lookahead : YYSymbol) -> YYDecision {
 // [7, object → • LBRACE RBRACE, RBRACKET / COMMA]
 // [8, object → • LBRACE members RBRACE, RBRACKET / COMMA]
 // [12, array → • LBRACKET RBRACKET, RBRACKET / COMMA]
+// [12, array → LBRACKET • RBRACKET, $ / RBRACE / RBRACKET / COMMA]
 // [13, array → • LBRACKET elements RBRACKET, RBRACKET / COMMA]
+// [13, array → LBRACKET • elements RBRACKET, $ / RBRACE / RBRACKET / COMMA]
 // [14, elements → • json_value, RBRACKET]
 // [15, elements → • json_value COMMA elements, RBRACKET]
 // [15, elements → json_value COMMA • elements, RBRACKET]

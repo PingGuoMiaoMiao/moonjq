@@ -1,0 +1,149 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "username/moonjq/cmd/lib/jsonparser"
+
+import(
+  "moonbitlang/core/list"
+)
+
+// Values
+fn json_array(Array[JsonValue]) -> JsonValue
+
+fn json_boolean(Bool) -> JsonValue
+
+fn json_null() -> JsonValue
+
+fn json_number_bigint(String) -> JsonValue
+
+fn json_number_float(Double) -> JsonValue
+
+fn json_object(Map[String, JsonValue]) -> JsonValue
+
+fn json_string(String) -> JsonValue
+
+fn json_value(Array[(Token, Int, Int)], initial_pos? : Int) -> JsonValue raise ParseError
+
+fn yy_action_12(Int, ArrayView[(Error, Int, Int)]) -> Error
+
+// Errors
+pub suberror ParseError {
+  UnexpectedToken(Token, (Int, Int), Array[TokenKind])
+  UnexpectedEndOfInput(Int, Array[TokenKind])
+}
+fn ParseError::output(Self, &Logger) -> Unit // from trait `Show`
+fn ParseError::to_string(Self) -> String // from trait `Show`
+impl Show for ParseError
+
+// Types and methods
+pub enum BinOp {
+  Add
+  Sub
+  Mul
+  Div
+  Mod
+  Eq
+  Neq
+  Lt
+  Gt
+  Lte
+  Gte
+  And
+  Or
+}
+
+pub enum Expr {
+  Ident
+  FieldAccess(Expr, String)
+  ArrayIndex(Expr, Int)
+  ArrayIter(Expr)
+  ObjectIter(Expr)
+  Pipe(Expr, Expr)
+  Literal(JsonValue)
+  BinaryOp(Expr, BinOp, Expr)
+  UnaryOp(UnOp, Expr)
+  Conditional(Expr, Expr, Expr)
+  Call(String, @list.List[Expr])
+  AsBinding(Expr, String)
+  VarRef(String)
+  Comma(Expr, Expr)
+  Select(Expr, Expr)
+  ArrayConstructor(@list.List[Expr])
+  ObjectConstructor(@list.List[(String, Expr)])
+}
+
+pub(all) enum JsonNumber {
+  Float(Double)
+  BigInt(String)
+}
+fn JsonNumber::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn JsonNumber::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn JsonNumber::output(Self, &Logger) -> Unit // from trait `Show`
+fn JsonNumber::to_json(Self) -> Json // from trait `ToJson`
+fn JsonNumber::to_string(Self) -> String // from trait `Show`
+impl Eq for JsonNumber
+impl Show for JsonNumber
+impl ToJson for JsonNumber
+
+pub(all) enum JsonValue {
+  String(String)
+  Number(JsonNumber)
+  Boolean(Bool)
+  Null
+  Object(Map[String, JsonValue])
+  Array(Array[JsonValue])
+}
+fn JsonValue::equal(Self, Self) -> Bool // from trait `Eq`
+#deprecated
+fn JsonValue::op_equal(Self, Self) -> Bool // from trait `Eq`
+fn JsonValue::output(Self, &Logger) -> Unit // from trait `Show`
+fn JsonValue::to_string(Self) -> String // from trait `Show`
+impl Eq for JsonValue
+impl Show for JsonValue
+
+pub(all) enum Token {
+  STRING(String)
+  NUMBER(JsonNumber)
+  TRUE
+  FALSE
+  NULL
+  LBRACE
+  RBRACE
+  LBRACKET
+  RBRACKET
+  COLON
+  COMMA
+}
+fn Token::kind(Self) -> TokenKind
+fn Token::output(Self, &Logger) -> Unit // from trait `Show`
+fn Token::to_json(Self) -> Json // from trait `ToJson`
+fn Token::to_string(Self) -> String // from trait `Show`
+impl Show for Token
+impl ToJson for Token
+
+pub(all) enum TokenKind {
+  TK_STRING
+  TK_NUMBER
+  TK_TRUE
+  TK_FALSE
+  TK_NULL
+  TK_LBRACE
+  TK_RBRACE
+  TK_LBRACKET
+  TK_RBRACKET
+  TK_COLON
+  TK_COMMA
+}
+fn TokenKind::output(Self, &Logger) -> Unit // from trait `Show`
+fn TokenKind::to_string(Self) -> String // from trait `Show`
+impl Show for TokenKind
+
+pub enum UnOp {
+  Neg
+  Not
+}
+
+// Type aliases
+pub typealias Map[String, JsonValue] as Object
+
+// Traits
+

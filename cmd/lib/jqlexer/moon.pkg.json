@@ -1,0 +1,12 @@
+{
+
+    // "pre-build": [
+    //     {
+    //         "command": "node $mod_dir/boot/snapshot/moonlex.cjs $input -o $output",
+    //         "input": "jqlexer.mbtx",
+    //         "output": "jqlexer.mbt"
+    //     }
+    // ],
+    // "warn-list": "-1",
+
+}

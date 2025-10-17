@@ -5,5 +5,11 @@
     //         "input": "parser.mbty",
     //         "output": "parser.mbt"
     //     }
-    // ]
+    // ],
+    "import":[
+        {
+            "path": "username/moonjq/cmd/lib/jsonlexer",
+            "alias": "lexer"
+        }
+    ]
 }

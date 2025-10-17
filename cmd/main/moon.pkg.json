@@ -1,26 +1,3 @@
 {
   "is-main": true,
-  "import": [
-    {
-      "path": "Yoorkin/ArgParser",
-      "alias": "ArgParser"
-    },
-    {
-      "path": "username/jq/cmd/lib/parser",
-      "alias": "parser"
-    },
-    {
-      "path": "username/jq/cmd/lib/lexer",
-      "alias": "lexer"
-    },
-    {
-      "path": "moonbitlang/ulex-runtime/lexbuf",
-      "alias": "lexbuf"
-    },
-    {
-      "path": "username/jq/cmd/lib/filters",
-      "alias": "filters"
-    },
-    "moonbitlang/x/sys"
-  ]
 }

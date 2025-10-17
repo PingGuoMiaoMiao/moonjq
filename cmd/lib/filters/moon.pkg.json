@@ -1,9 +1,0 @@
-{
-  "import": [
-    {
-      "path": "username/jq/cmd/lib/parser",
-      "alias": "parser"
-    }
-  ]
-  
-}

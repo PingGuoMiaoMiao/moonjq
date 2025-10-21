@@ -1,0 +1,49 @@
+# C to Rust 转译工具评测配置示例
+# 根据实际情况修改此文件并重命名为 config.toml
+
+# chibicc 项目转译配置
+[problem.chibicc]
+# Docker镜像ID（构建后替换为实际的镜像ID）
+docker_image = "c2rust-translator:latest"
+
+# 代码生成阶段的工作目录
+codegen_workdir = "/workspace"
+
+# 代码生成命令（假设转译工具主程序为 translator）
+codegen_command = "/workspace/translator translate --input /workspace/translate_chibicc --output /workspace/output/chibicc"
+
+# 代码生成日志输出路径
+codegen_logfile = "/workspace/output/chibicc/translation.log"
+
+# 生成的Rust代码所在目录
+codegen_resultdir = "/workspace/output/chibicc"
+
+# 构建命令（在 codegen_resultdir 目录下执行）
+build_command = "cargo build --release"
+
+# 生成的可执行文件路径
+exe = "/workspace/output/chibicc/target/release/chibicc"
+
+
+# littlefs_fuse 项目转译配置
+[problem.littlefs_fuse]
+# Docker镜像ID
+docker_image = "c2rust-translator:latest"
+
+# 代码生成阶段的工作目录
+codegen_workdir = "/workspace"
+
+# 代码生成命令
+codegen_command = "/workspace/translator translate --input /workspace/translate_littlefs_fuse --output /workspace/output/littlefs_fuse"
+
+# 代码生成日志输出路径
+codegen_logfile = "/workspace/output/littlefs_fuse/translation.log"
+
+# 生成的Rust代码所在目录
+codegen_resultdir = "/workspace/output/littlefs_fuse"
+
+# 构建命令
+build_command = "cargo build --release"
+
+# 生成的可执行文件路径
+exe = "/workspace/output/littlefs_fuse/target/release/lfs_fuse"

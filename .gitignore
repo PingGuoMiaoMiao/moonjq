@@ -2,3 +2,7 @@
 target/
 .mooncakes/
 .moonagent/
+
+# Added by cargo
+
+/target

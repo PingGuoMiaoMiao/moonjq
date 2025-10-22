@@ -1,0 +1,16 @@
+{
+  "import":[
+    {
+      "path": "moonbitlang/x/sys",
+      "alias": "sys"
+    },
+    {
+      "path":  "moonbitlang/x/fs",
+      "alias": "fs"
+    },
+    {
+      "path": "username/moonjq/cmd/lib/Filter",
+      "alias": "filter"
+    }
+  ]
+}

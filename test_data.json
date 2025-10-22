@@ -1,0 +1,11 @@
+{
+  "users": [
+    {"name": "Alice", "age": 30, "city": "New York"},
+    {"name": "Bob", "age": 25, "city": "London"},
+    {"name": "Charlie", "age": 35, "city": "Tokyo"}
+  ],
+  "metadata": {
+    "version": "1.0",
+    "created": "2024-01-01"
+  }
+}

@@ -85,21 +85,4 @@ fn escape_string(s: String) -> String {
   result.to_string()
 }
 
-///|
-fn format_hex(n: Int, width: Int) -> String {
-  let hex_chars = "0123456789abcdef"
-  let result = StringBuilder::new()
-  let mut num = n
-  for i = 0; i < width; i = i + 1 {
-    let digit = num % 16
-    result.write_string(hex_chars[digit].to_string())
-    num = num / 16
-  }
-  // 反转字符串
-  let chars = result.to_string().to_array()
-  let reversed = StringBuilder::new()
-  for i = chars.length() - 1; i >= 0; i = i - 1 {
-    reversed.write_string(chars[i].to_string())
-  }
-  reversed.to_string()
-}
+// 未使用的函数已删除

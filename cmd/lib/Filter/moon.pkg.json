@@ -1,20 +1,12 @@
 {
-    "import": [
-      {
-        "path": "username/moonjq/cmd/lib/jsonlexer",
-        "alias": "jsonlexer"
-      },
-      {
-        "path": "username/moonjq/cmd/lib/jsonparser",
-        "alias": "jsonparser"
-      },
-      {
-        "path": "username/moonjq/cmd/lib/jqlexer",
-        "alias": "jqlexer"
-      },
-      {
-        "path": "username/moonjq/cmd/lib/jqparser",
-        "alias": "jqparser"
-      },
-    ]
+  "import": [
+    {
+      "path": "moonbitlang/x/fs",
+      "alias": "fs"
+    }
+  ],
+  "sources": [
+    "filter.mbt",
+    "simple_real_jq.mbt"
+  ]
 }

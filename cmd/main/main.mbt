@@ -23,19 +23,31 @@ fn main {
     if args.length() > 2 {
       // 从文件读取输入
       let filename = args[2]
-      let result = safe_run_jq_query_from_file(query, filename)
-      @prelude.println(result)
+      try {
+        let result = safe_run_jq_query_from_file(query, filename)
+        @prelude.println(result)
+      } catch {
+        e => {
+          @prelude.println("Error: File processing failed - " + e.to_string())
+        }
+      }
     } else {
       // 使用示例JSON数据
       let input = "{\"users\": [{\"name\": \"Alice\", \"age\": 30}, {\"name\": \"Bob\", \"age\": 25}]}"
-      let result = safe_run_jq_query(query, input)
-      @prelude.println(result)
+      try {
+        let result = safe_run_jq_query(query, input)
+        @prelude.println(result)
+      } catch {
+        e => {
+          @prelude.println("Error: Query execution failed - " + e.to_string())
+        }
+      }
     }
   }
 }
 
 // 安全的 jq 查询函数
-fn safe_run_jq_query(query: String, input: String) -> String {
+fn safe_run_jq_query(query: String, input: String) -> String raise {
   match @filter.run_jq_query(query, input) {
     Ok(result) => result
     Err(msg) => "Error: " + msg
@@ -43,7 +55,7 @@ fn safe_run_jq_query(query: String, input: String) -> String {
 }
 
 // 安全的文件 jq 查询函数
-fn safe_run_jq_query_from_file(query: String, filename: String) -> String {
+fn safe_run_jq_query_from_file(query: String, filename: String) -> String raise {
   match @filter.run_jq_query_from_file(query, filename) {
     Ok(result) => result
     Err(msg) => "Error: " + msg
@@ -74,5 +86,4 @@ fn print_usage() -> Unit {
   @prelude.println("  - Comparison: ==, !=, <, >, <=, >=")
   @prelude.println("  - Logical: and, or, not")
   @prelude.println("  - Array/Object construction: [], {}")
-}
 }

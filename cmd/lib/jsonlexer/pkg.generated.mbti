@@ -1,0 +1,28 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "username/moonjq/cmd/lib/jsonlexer"
+
+// Values
+
+// Errors
+pub suberror LexError {
+  EndOfFile
+  UnexpectedEndOfFile
+  Unrecognized(String)
+}
+
+// Types and methods
+pub(all) struct LexEngine {
+  graph : Array[(Int) -> (Int, Array[Array[Int]])]
+  end_nodes : Array[(Int, Array[((Int, Int), (Int, Int))])?]
+  start_tags : Array[Int]
+  code_blocks_n : Int
+}
+fn LexEngine::run(Self, Lexbuf) -> (Int, Array[(Int, Int)])
+
+type Lexbuf
+fn Lexbuf::from_string(String) -> Self
+
+// Type aliases
+
+// Traits
+

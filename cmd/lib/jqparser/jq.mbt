@@ -10,6 +10,32 @@ pub(all) enum Token {
   IDENT(String)
   NUMBER(Int)
   STRING(String)
+  TRUE
+  FALSE
+  NULL
+  COMMA
+  COLON
+  EQ
+  NEQ
+  GT
+  LT
+  GTE
+  LTE
+  PLUS
+  MINUS
+  STAR
+  SLASH
+  PERCENT
+  AND
+  OR
+  NOT
+  SELECT
+  IF
+  THEN
+  ELSE
+  END
+  AS
+  VAR(String)
 } derive(Show)
 
 ///|
@@ -25,6 +51,32 @@ pub fn Token::kind(self : Token) -> TokenKind {
     IDENT(_) => TK_IDENT
     NUMBER(_) => TK_NUMBER
     STRING(_) => TK_STRING
+    TRUE => TK_TRUE
+    FALSE => TK_FALSE
+    NULL => TK_NULL
+    COMMA => TK_COMMA
+    COLON => TK_COLON
+    EQ => TK_EQ
+    NEQ => TK_NEQ
+    GT => TK_GT
+    LT => TK_LT
+    GTE => TK_GTE
+    LTE => TK_LTE
+    PLUS => TK_PLUS
+    MINUS => TK_MINUS
+    STAR => TK_STAR
+    SLASH => TK_SLASH
+    PERCENT => TK_PERCENT
+    AND => TK_AND
+    OR => TK_OR
+    NOT => TK_NOT
+    SELECT => TK_SELECT
+    IF => TK_IF
+    THEN => TK_THEN
+    ELSE => TK_ELSE
+    END => TK_END
+    AS => TK_AS
+    VAR(_) => TK_VAR
   }
 }
 
@@ -40,6 +92,32 @@ pub(all) enum TokenKind {
   TK_IDENT
   TK_NUMBER
   TK_STRING
+  TK_TRUE
+  TK_FALSE
+  TK_NULL
+  TK_COMMA
+  TK_COLON
+  TK_EQ
+  TK_NEQ
+  TK_GT
+  TK_LT
+  TK_GTE
+  TK_LTE
+  TK_PLUS
+  TK_MINUS
+  TK_STAR
+  TK_SLASH
+  TK_PERCENT
+  TK_AND
+  TK_OR
+  TK_NOT
+  TK_SELECT
+  TK_IF
+  TK_THEN
+  TK_ELSE
+  TK_END
+  TK_AS
+  TK_VAR
 }
 
 ///|
@@ -56,6 +134,32 @@ pub impl Show for TokenKind with output(self, logger) {
       TK_IDENT => "IDENT"
       TK_NUMBER => "NUMBER"
       TK_STRING => "STRING"
+      TK_TRUE => "TRUE"
+      TK_FALSE => "FALSE"
+      TK_NULL => "NULL"
+      TK_COMMA => "\",\""
+      TK_COLON => "\":\""
+      TK_EQ => "\"==\""
+      TK_NEQ => "\"!=\""
+      TK_GT => "\">\""
+      TK_LT => "\"<\""
+      TK_GTE => "\">=\""
+      TK_LTE => "\"<=\""
+      TK_PLUS => "\"+\""
+      TK_MINUS => "\"-\""
+      TK_STAR => "\"*\""
+      TK_SLASH => "\"/\""
+      TK_PERCENT => "\"%\""
+      TK_AND => "AND"
+      TK_OR => "OR"
+      TK_NOT => "NOT"
+      TK_SELECT => "SELECT"
+      TK_IF => "IF"
+      TK_THEN => "THEN"
+      TK_ELSE => "ELSE"
+      TK_END => "END"
+      TK_AS => "AS"
+      TK_VAR => "VAR"
     },
   )
 }
@@ -111,6 +215,32 @@ priv enum YYSymbol {
   T_IDENT
   T_NUMBER
   T_STRING
+  T_TRUE
+  T_FALSE
+  T_NULL
+  T_COMMA
+  T_COLON
+  T_EQ
+  T_NEQ
+  T_GT
+  T_LT
+  T_GTE
+  T_LTE
+  T_PLUS
+  T_MINUS
+  T_STAR
+  T_SLASH
+  T_PERCENT
+  T_AND
+  T_OR
+  T_NOT
+  T_SELECT
+  T_IF
+  T_THEN
+  T_ELSE
+  T_END
+  T_AS
+  T_VAR
   NT_start
   NT_expr
   NT_primary
@@ -312,6 +442,32 @@ fn yy_input(
     IDENT(data) => (T_IDENT, YYObj_String(data))
     NUMBER(data) => (T_NUMBER, YYObj_Int(data))
     STRING(data) => (T_STRING, YYObj_String(data))
+    TRUE => (T_TRUE, YYObj_Void)
+    FALSE => (T_FALSE, YYObj_Void)
+    NULL => (T_NULL, YYObj_Void)
+    COMMA => (T_COMMA, YYObj_Void)
+    COLON => (T_COLON, YYObj_Void)
+    EQ => (T_EQ, YYObj_Void)
+    NEQ => (T_NEQ, YYObj_Void)
+    GT => (T_GT, YYObj_Void)
+    LT => (T_LT, YYObj_Void)
+    GTE => (T_GTE, YYObj_Void)
+    LTE => (T_LTE, YYObj_Void)
+    PLUS => (T_PLUS, YYObj_Void)
+    MINUS => (T_MINUS, YYObj_Void)
+    STAR => (T_STAR, YYObj_Void)
+    SLASH => (T_SLASH, YYObj_Void)
+    PERCENT => (T_PERCENT, YYObj_Void)
+    AND => (T_AND, YYObj_Void)
+    OR => (T_OR, YYObj_Void)
+    NOT => (T_NOT, YYObj_Void)
+    SELECT => (T_SELECT, YYObj_Void)
+    IF => (T_IF, YYObj_Void)
+    THEN => (T_THEN, YYObj_Void)
+    ELSE => (T_ELSE, YYObj_Void)
+    END => (T_END, YYObj_Void)
+    AS => (T_AS, YYObj_Void)
+    VAR(data) => (T_VAR, YYObj_String(data))
   }
 }
 
@@ -704,3 +860,4 @@ pub fn start(
     initial_pos?,
   )
 }
+

@@ -953,3 +953,4 @@ fn list_to_array(lst: @list.List[JsonValue]) -> Array[JsonValue] {
 fn init {
   // 例如，初始化词法分析器或注册解析器
 }
+

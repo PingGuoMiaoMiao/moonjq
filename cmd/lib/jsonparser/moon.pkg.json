@@ -9,7 +9,7 @@
     "import":[
         {
             "path": "username/moonjq/cmd/lib/jsonlexer",
-            "alias": "lexer"
+            "alias": "jsonlexer"
         }
     ]
 }

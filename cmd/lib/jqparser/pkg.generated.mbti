@@ -2,10 +2,70 @@
 package "username/moonjq/cmd/lib/jqparser"
 
 // Values
+fn start(Array[(Token, Int, Int)], initial_pos? : Int) -> Expr raise ParseError
 
 // Errors
+pub suberror ParseError {
+  UnexpectedToken(Token, (Int, Int), Array[TokenKind])
+  UnexpectedEndOfInput(Int, Array[TokenKind])
+}
+fn ParseError::output(Self, &Logger) -> Unit // from trait `Show`
+fn ParseError::to_string(Self) -> String // from trait `Show`
+impl Show for ParseError
 
 // Types and methods
+pub enum Expr {
+  Identity
+  FieldAccess(Field)
+  Index(Expr, Int)
+  Number(Int)
+  String(String)
+  Pipe(Expr, Expr)
+}
+fn Expr::output(Self, &Logger) -> Unit // from trait `Show`
+fn Expr::to_string(Self) -> String // from trait `Show`
+impl Show for Expr
+
+pub enum Field {
+  Single(String)
+  Chain(Field, String)
+}
+fn Field::output(Self, &Logger) -> Unit // from trait `Show`
+fn Field::to_string(Self) -> String // from trait `Show`
+impl Show for Field
+
+pub(all) enum Token {
+  EOF
+  DOT
+  PIPE
+  LBRACKET
+  RBRACKET
+  LPAREN
+  RPAREN
+  IDENT(String)
+  NUMBER(Int)
+  STRING(String)
+}
+fn Token::kind(Self) -> TokenKind
+fn Token::output(Self, &Logger) -> Unit // from trait `Show`
+fn Token::to_string(Self) -> String // from trait `Show`
+impl Show for Token
+
+pub(all) enum TokenKind {
+  TK_EOF
+  TK_DOT
+  TK_PIPE
+  TK_LBRACKET
+  TK_RBRACKET
+  TK_LPAREN
+  TK_RPAREN
+  TK_IDENT
+  TK_NUMBER
+  TK_STRING
+}
+fn TokenKind::output(Self, &Logger) -> Unit // from trait `Show`
+fn TokenKind::to_string(Self) -> String // from trait `Show`
+impl Show for TokenKind
 
 // Type aliases
 

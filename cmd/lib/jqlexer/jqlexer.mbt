@@ -43,8 +43,7 @@ pub fn Lexbuf::curr_pos(self: Lexbuf) -> Int {
   self.pos
 }
 
-
-priv enum Token {
+pub enum Token {
   WHITESPACE // Explicitly include WHITESPACE as a token
   DOT        // .
   PIPE       // |
@@ -86,7 +85,7 @@ pub suberror LexError {
 }
 
 
-fn token(lexbuf: Lexbuf) -> Token raise LexError  {
+pub fn token(lexbuf: Lexbuf) -> Token raise LexError  {
   // The matched pattern id
   let mut _match_pattern = @int.max_value
   let mut _match_start = lexbuf.curr_pos()
@@ -793,7 +792,7 @@ fn token(lexbuf: Lexbuf) -> Token raise LexError  {
 }
 
 
-fn lex_string(buf : StringBuilder, lexbuf: Lexbuf) -> Unit raise LexError  {
+pub fn lex_string(buf : StringBuilder, lexbuf: Lexbuf) -> Unit raise LexError  {
   // The matched pattern id
   let mut _match_pattern = @int.max_value
   let mut _match_start = lexbuf.curr_pos()
@@ -936,6 +935,7 @@ fn lex_string(buf : StringBuilder, lexbuf: Lexbuf) -> Unit raise LexError  {
   }
 }
 
+///|
 
 
 

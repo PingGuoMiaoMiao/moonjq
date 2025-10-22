@@ -95,7 +95,7 @@ pub fn run(self : LexEngine, lexbuf : Lexbuf) -> (Int, Array[(Int, Int)]) {
 
 
 
-priv enum Token {
+pub enum Token {
   WHITESPACE
   NUMBER(String)
   STRING(String)
@@ -599,5 +599,3 @@ fn lex_string( buf : StringBuilder, lexbuf : Lexbuf ) -> Unit raise LexError {
     _ => abort("lex: fail to match")
   }
 }
-
-

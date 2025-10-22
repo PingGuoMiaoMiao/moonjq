@@ -1,0 +1,25 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "username/moonjq/cmd/lib/jqlexer"
+
+// Values
+
+// Errors
+pub suberror LexError {
+  EndOfFile
+  UnexpectedEndOfFile
+  Unrecognized(String)
+}
+
+// Types and methods
+type Lexbuf
+fn Lexbuf::curr_pos(Self) -> Int
+fn Lexbuf::from_string(String) -> Self
+fn Lexbuf::get_char(Self, Int, Int) -> String
+fn Lexbuf::get_string(Self, Int, Int) -> String
+fn Lexbuf::next_as_int(Self) -> Int
+fn Lexbuf::reset(Self, Int) -> Unit
+
+// Type aliases
+
+// Traits
+

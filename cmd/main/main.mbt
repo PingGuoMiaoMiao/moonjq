@@ -19,35 +19,35 @@ fn main {
     // 直接输出硬编码的结果
     @prelude.println("{\"a\":1,\"b\":{\"c\":2},\"x\":null}")
   } else {
-    // 测试文件读取功能
+    // 使用真正的 jq 实现
     if args.length() > 2 {
       // 从文件读取输入
       let filename = args[2]
-      @prelude.println("Reading from file: " + filename)
-      try {
-        let file_content = safe_read_file(filename)
-        @prelude.println("File content: " + file_content)
-        @prelude.println("Query: " + query)
-        @prelude.println("Result: File read successfully, but jq processing not yet implemented")
-      } catch {
-        _ => {
-          @prelude.println("Error reading file")
-          @sys.exit(1)
-        }
-      }
+      let result = safe_run_jq_query_from_file(query, filename)
+      @prelude.println(result)
     } else {
       // 使用示例JSON数据
       let input = "{\"users\": [{\"name\": \"Alice\", \"age\": 30}, {\"name\": \"Bob\", \"age\": 25}]}"
-      @prelude.println("Testing with hardcoded data: " + input)
-      @prelude.println("Query: " + query)
-      @prelude.println("Result: {\"users\": [{\"name\": \"Alice\", \"age\": 30}, {\"name\": \"Bob\", \"age\": 25}]}")
+      let result = safe_run_jq_query(query, input)
+      @prelude.println(result)
     }
   }
 }
 
-// 安全的文件读取函数
-fn safe_read_file(filename: String) -> String raise {
-  @fs.read_file_to_string(filename)
+// 安全的 jq 查询函数
+fn safe_run_jq_query(query: String, input: String) -> String {
+  match @filter.run_jq_query(query, input) {
+    Ok(result) => result
+    Err(msg) => "Error: " + msg
+  }
+}
+
+// 安全的文件 jq 查询函数
+fn safe_run_jq_query_from_file(query: String, filename: String) -> String {
+  match @filter.run_jq_query_from_file(query, filename) {
+    Ok(result) => result
+    Err(msg) => "Error: " + msg
+  }
 }
 
 fn print_usage() -> Unit {
@@ -74,4 +74,5 @@ fn print_usage() -> Unit {
   @prelude.println("  - Comparison: ==, !=, <, >, <=, >=")
   @prelude.println("  - Logical: and, or, not")
   @prelude.println("  - Array/Object construction: [], {}")
+}
 }

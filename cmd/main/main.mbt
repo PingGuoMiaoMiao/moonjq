@@ -14,40 +14,22 @@ fn main {
     args[1]  // 直接查询
   }
   
-  // 检查是否是 pick 函数调用
-  if query.has_prefix("pick(") {
-    // 直接输出硬编码的结果
-    @prelude.println("{\"a\":1,\"b\":{\"c\":2},\"x\":null}")
+  // 使用真正的 jq 实现
+  if args.length() > 2 {
+    // 从文件读取输入
+    let filename = args[2]
+    let result = safe_run_jq_query_from_file(query, filename)
+    @prelude.println(result)
   } else {
-    // 使用真正的 jq 实现
-    if args.length() > 2 {
-      // 从文件读取输入
-      let filename = args[2]
-      try {
-        let result = safe_run_jq_query_from_file(query, filename)
-        @prelude.println(result)
-      } catch {
-        e => {
-          @prelude.println("Error: File processing failed - " + e.to_string())
-        }
-      }
-    } else {
-      // 使用示例JSON数据
-      let input = "{\"users\": [{\"name\": \"Alice\", \"age\": 30}, {\"name\": \"Bob\", \"age\": 25}]}"
-      try {
-        let result = safe_run_jq_query(query, input)
-        @prelude.println(result)
-      } catch {
-        e => {
-          @prelude.println("Error: Query execution failed - " + e.to_string())
-        }
-      }
-    }
+    // 从 stdin 读取输入（这里使用示例数据模拟）
+    let input = "{\"users\": [{\"name\": \"Alice\", \"age\": 30}, {\"name\": \"Bob\", \"age\": 25}]}"
+    let result = safe_run_jq_query(query, input)
+    @prelude.println(result)
   }
 }
 
 // 安全的 jq 查询函数
-fn safe_run_jq_query(query: String, input: String) -> String raise {
+fn safe_run_jq_query(query: String, input: String) -> String {
   match @filter.run_jq_query(query, input) {
     Ok(result) => result
     Err(msg) => "Error: " + msg
@@ -55,7 +37,7 @@ fn safe_run_jq_query(query: String, input: String) -> String raise {
 }
 
 // 安全的文件 jq 查询函数
-fn safe_run_jq_query_from_file(query: String, filename: String) -> String raise {
+fn safe_run_jq_query_from_file(query: String, filename: String) -> String {
   match @filter.run_jq_query_from_file(query, filename) {
     Ok(result) => result
     Err(msg) => "Error: " + msg

@@ -3,10 +3,22 @@
     {
       "path": "moonbitlang/x/fs",
       "alias": "fs"
+    },
+    {
+      "path": "username/moonjq/cmd/lib/jqlexer",
+      "alias": "jqlexer"
+    },
+    {
+      "path": "username/moonjq/cmd/lib/jqparser",
+      "alias": "jqparser"
+    },
+    {
+      "path": "username/moonjq/cmd/lib/jsonlexer",
+      "alias": "jsonlexer"
+    },
+    {
+      "path": "username/moonjq/cmd/lib/jsonparser",
+      "alias": "jsonparser"
     }
   ],
-  "sources": [
-    "filter.mbt",
-    "simple_real_jq.mbt"
-  ]
 }
